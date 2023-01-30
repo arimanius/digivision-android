@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">digivision</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="placeholder_product_title">عنوان محصول</string>
+    <string name="search_query">Search query</string>
+    <string name="search_button">Search button</string>
+    <string name="home_title">دیجی‌ویژن</string>
 </resources>
