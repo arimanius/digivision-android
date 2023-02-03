@@ -7,9 +7,19 @@ option objc_class_prefix = "DVSS";
 
 package v1;
 
+enum Ranker {
+  FIRST_IMAGE = 0;
+  DIST_COUNT = 1;
+}
+
+message SearchParams {
+  int32 top_k = 1;
+  Ranker ranker = 2;
+}
+
 message SearchRequest {
   bytes image = 1;
-  int32 top_k = 2;
+  SearchParams params = 2;
 }
 
 message Rating {

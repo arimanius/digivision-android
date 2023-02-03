@@ -7,4 +7,6 @@
     <string name="search_query">Search query</string>
     <string name="search_button">Search button</string>
     <string name="home_title">دیجی‌ویژن</string>
+    <string name="main_image">mainImage</string>
+    <string name="price">قیمت</string>
 </resources>

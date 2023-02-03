@@ -58,7 +58,10 @@ class SearchRepository {
         val stub = SearchServiceGrpc.newBlockingStub(channel)
         val products = stub.asyncSearch(searchRequest {
             this.image = ByteString.copyFrom(image)
-            this.topK = 100
+            this.params = searchParams {
+                this.topK = 10
+                this.ranker = Ranker.FIRST_IMAGE
+            }
         })
         Log.d("SearchRepository", "search initiated")
         CoroutineScope(Dispatchers.IO).launch {
