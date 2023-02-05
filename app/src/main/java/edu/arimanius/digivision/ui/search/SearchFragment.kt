@@ -38,6 +38,8 @@ import kotlin.math.max
  */
 class SearchFragment : Fragment() {
     private val PERMISSION_REQUEST_CODE = 200
+
+    //    private val WRITE_EXTERNAL_STORAGE_REQUEST_CODE = 112
     private lateinit var cropImage: ActivityResultLauncher<CropImageContractOptions>
     private var _binding: FragmentSearchBinding? = null
     private val binding get() = _binding!!
@@ -66,8 +68,19 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProvider(
             this,
-            SearchViewModelFactory()
+            SearchViewModelFactory(requireContext())
         )[SearchViewModel::class.java]
+
+        val bundle = arguments
+        if (bundle != null) {
+            val imageUri = bundle.getString("imageUri")
+            val historyId = bundle.getLong("historyId")
+            binding.imageView.setImageURI(Uri.parse(imageUri))
+            viewModel.getProductsByHistory(historyId).observe(viewLifecycleOwner) {
+                it ?: return@observe
+                (binding.list.adapter as SearchRecyclerViewAdapter).updateAllProducts(it)
+            }
+        }
 
         cropImage = registerForActivityResult(CropImageContract()) { result ->
             if (result.isSuccessful) {
@@ -116,18 +129,18 @@ class SearchFragment : Fragment() {
         dialogBuilder.setMessage("از کدام روش؟")
             .setCancelable(true)
             .setPositiveButton("دوربین") { _, _ ->
-                if (checkPermission()) {
-                    takePicture.launch(uri)
-                } else {
-                    requestPermission()
-                }
+                takePicture.launch(uri)
             }
             .setNegativeButton("گالری") { _, _ ->
                 pickMedia.launch(PickVisualMediaRequest.Builder().build())
             }
 
         binding.searchButton.setOnClickListener {
-            dialogBuilder.show()
+            if (checkPermission()) {
+                dialogBuilder.show()
+            } else {
+                requestPermission()
+            }
         }
     }
 
@@ -168,12 +181,16 @@ class SearchFragment : Fragment() {
         return ContextCompat.checkSelfPermission(
             requireContext(),
             Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
         ) == PackageManager.PERMISSION_GRANTED
     }
 
     private fun requestPermission() {
         ActivityCompat.requestPermissions(
-            requireActivity(), arrayOf(Manifest.permission.CAMERA),
+            requireActivity(),
+            arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
             PERMISSION_REQUEST_CODE
         )
     }

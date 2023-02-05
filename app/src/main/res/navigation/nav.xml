@@ -3,11 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav"
-    app:startDestination="@id/searchFragment">
+    app:startDestination="@id/historyFragment">
 
     <fragment
         android:id="@+id/searchFragment"
         android:name="edu.arimanius.digivision.ui.search.SearchFragment"
-        android:label="@string/home_title"
-        tools:layout="@layout/fragment_search" />
+        android:label="جستجو"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment_to_historyFragment"
+            app:destination="@id/historyFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="edu.arimanius.digivision.ui.search.HistoryFragment"
+        android:label="تاریخچه" >
+        <action
+            android:id="@+id/action_historyFragment_to_searchFragment"
+            app:destination="@id/searchFragment" />
+    </fragment>
 </navigation>

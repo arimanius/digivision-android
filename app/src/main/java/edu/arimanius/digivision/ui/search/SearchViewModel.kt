@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import edu.arimanius.digivision.api.search.CropResponse
 import edu.arimanius.digivision.api.search.Product
+import edu.arimanius.digivision.data.entity.History
 import edu.arimanius.digivision.data.http.dto.HttpCropResponse
 import edu.arimanius.digivision.data.repository.SearchRepository
 import kotlinx.coroutines.CoroutineScope
@@ -32,5 +33,13 @@ class SearchViewModel(val searchRepository: SearchRepository) : ViewModel() {
 
     fun search(image: ByteArray) {
         searchResult = searchRepository.search(image)
+    }
+
+    fun getHistory(): LiveData<List<History>> {
+        return searchRepository.getHistory()
+    }
+
+    fun getProductsByHistory(historyId: Long): LiveData<List<Product>> {
+        return searchRepository.searchInHistory(historyId)
     }
 }

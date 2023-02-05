@@ -1,6 +1,6 @@
 package edu.arimanius.digivision.ui.search
 
-import android.graphics.BitmapFactory
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -9,11 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import edu.arimanius.digivision.api.search.Product
 import edu.arimanius.digivision.databinding.FragmentProductItemBinding
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.net.URL
 
 class SearchRecyclerViewAdapter(
     private var products: List<Product> = emptyList()
@@ -33,17 +28,23 @@ class SearchRecyclerViewAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = products[position]
         holder.titleView.text = item.title
-        holder.priceView.text = if(item.status == "marketable") {
-            "${item.price/10} تومان"
+        holder.priceView.text = if (item.status == "marketable") {
+            "${item.price / 10} تومان"
         } else {
             "ناموجود"
         }
         Glide.with(holder.binding.root).load(item.imageUrl).into(holder.imageView)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateAllProducts(products: List<Product>) {
+        this.products = products
+        notifyDataSetChanged()
+    }
+
     fun updateProducts(products: List<Product>) {
         this.products = products
-        notifyItemInserted(products.size)
+        notifyItemInserted(products.size - 1)
     }
 
     override fun getItemCount(): Int = products.size
