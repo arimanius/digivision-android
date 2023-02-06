@@ -1,12 +1,11 @@
 package edu.arimanius.digivision.data.repository
 
-import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.provider.MediaStore
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.protobuf.ByteString
@@ -18,8 +17,8 @@ import edu.arimanius.digivision.data.entity.CategoryHistory
 import edu.arimanius.digivision.data.entity.History
 import edu.arimanius.digivision.data.entity.ProductHistory
 import edu.arimanius.digivision.data.http.DigivisionRESTClient
-import edu.arimanius.digivision.data.http.dto.HttpCropRequest
 import edu.arimanius.digivision.data.http.dto.CropResponse
+import edu.arimanius.digivision.data.http.dto.HttpCropRequest
 import edu.arimanius.digivision.data.http.dto.Position
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.CoroutineScope
@@ -27,9 +26,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.await
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.util.Base64
+import java.io.*
+import java.util.*
+
 
 class SearchRepository(
     private val context: Context,
@@ -187,30 +186,22 @@ class SearchRepository(
     }
 
     private fun saveImage(image: ByteArray, name: String): Uri {
-        val values = ContentValues().apply {
-            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
-        }
-
         var uri: Uri? = null
 
         return runCatching {
-            with(context.contentResolver) {
-                insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)?.also {
-                    uri = it // Keep uri reference so it can be removed on failure
-                    val bitmap = BitmapFactory.decodeByteArray(image, 0, image.size)
-                    openOutputStream(it)?.use { stream ->
-                        if (!bitmap.compress(Bitmap.CompressFormat.PNG, 95, stream))
-                            throw IOException("Failed to save bitmap.")
-                    } ?: throw IOException("Failed to open output stream.")
-
-                } ?: throw IOException("Failed to create new MediaStore record.")
+            val file = File(context.getExternalFilesDir(null), name)
+            uri = file.toUri()
+            val bitmap = BitmapFactory.decodeByteArray(image, 0, image.size)
+            FileOutputStream(file).use { stream ->
+                if (!bitmap.compress(Bitmap.CompressFormat.PNG, 95, stream))
+                    throw IOException("Failed to save bitmap.")
             }
+            uri!!
         }.getOrElse {
             uri?.let { orphanUri ->
                 // Don't leave an orphan entry in the MediaStore
                 context.contentResolver.delete(orphanUri, null, null)
             }
-
             throw it
         }
     }
