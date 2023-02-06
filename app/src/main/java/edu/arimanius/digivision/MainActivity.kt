@@ -2,8 +2,6 @@ package edu.arimanius.digivision
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.MenuItem
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -11,8 +9,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import edu.arimanius.digivision.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    var isHome = false
-    private lateinit var binding: ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,17 +36,5 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         navController.navigate(R.id.historyFragment)
         return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (!isHome) {
-            return super.onOptionsItemSelected(item)
-        }
-        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
-        val actionBarDrawerToggle =
-            ActionBarDrawerToggle(this, drawerLayout, R.string.open, R.string.close)
-        return if (actionBarDrawerToggle.onOptionsItemSelected(item)) {
-            true
-        } else super.onOptionsItemSelected(item)
     }
 }

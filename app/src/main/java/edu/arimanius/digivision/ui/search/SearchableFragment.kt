@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
+import edu.arimanius.digivision.MainActivity
 import java.io.File
 
 abstract class SearchableFragment : Fragment() {
@@ -107,6 +108,7 @@ abstract class SearchableFragment : Fragment() {
 
     private fun startCropper(uri: Uri) {
         val byteArray = loadImageToByteArray(uri)
+        (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.VISIBLE
         val cropResult = viewModel.crop(byteArray)
         cropResult.observe(viewLifecycleOwner) { bb ->
             val cropRect = Rect(
@@ -116,6 +118,7 @@ abstract class SearchableFragment : Fragment() {
                 bb.bottomRight.y + ((bb.bottomRight.y - bb.topLeft.y).toFloat() / 10).toInt(),
             )
             Log.d("CROP", bb.toString())
+            (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
             cropImage.launch(
                 CropImageContractOptions(
                     uri = uri,

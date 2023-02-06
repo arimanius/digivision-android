@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import edu.arimanius.digivision.MainActivity
 import edu.arimanius.digivision.databinding.FragmentSearchBinding
 
 
@@ -45,15 +46,18 @@ class SearchFragment : SearchableFragment() {
         if (bundle != null) {
             when (bundle.getString("action")) {
                 "history" -> {
+                    (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.VISIBLE
                     val imageUri = bundle.getString("imageUri")
                     val historyId = bundle.getLong("historyId")
                     binding.imageView.setImageURI(Uri.parse(imageUri))
                     viewModel.getProductsByHistory(historyId).observe(viewLifecycleOwner) {
                         it ?: return@observe
+                        (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
                         (binding.list.adapter as SearchRecyclerViewAdapter).updateProducts(it)
                     }
                 }
                 "search" -> {
+                    (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.VISIBLE
                     val imageUri = Uri.parse(bundle.getString("imageUri"))
                     binding.imageView.setImageURI(imageUri)
                     val image = loadImageToByteArray(imageUri)
@@ -63,6 +67,7 @@ class SearchFragment : SearchableFragment() {
                     (binding.list.adapter as SearchRecyclerViewAdapter).clearProducts()
                     viewModel.searchResult.observe(viewLifecycleOwner) {
                         it ?: return@observe
+                        (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
                         (binding.list.adapter as SearchRecyclerViewAdapter).updateProducts(it)
                     }
                     Log.d("ImageCropper", "search done")
