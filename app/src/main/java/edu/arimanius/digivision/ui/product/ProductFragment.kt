@@ -71,7 +71,7 @@ class ProductFragment : Fragment() {
             "ناموجود"
         }
         binding.ratingBar.rating = product.rate.rate.toFloat() / 20
-        binding.ratingCount.text = "${product.rate.count} رای"
+        binding.ratingCount.text = "${product.rate.count} نظر"
         binding.productTitle.setOnClickListener {
             val uri = Uri.parse(product.url)
             val intent = Intent(Intent.ACTION_VIEW, uri)

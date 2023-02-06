@@ -71,6 +71,10 @@ class SearchFragment : SearchableFragment() {
             (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
             (binding.list.adapter as SearchRecyclerViewAdapter).updateProducts(it)
         }
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            it ?: return@observe
+            (binding.list.adapter as SearchRecyclerViewAdapter).updateLoading(it)
+        }
     }
 
     override fun onImageCropped(uri: Uri) {
@@ -83,6 +87,10 @@ class SearchFragment : SearchableFragment() {
             it ?: return@observe
             (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
             (binding.list.adapter as SearchRecyclerViewAdapter).updateProducts(it)
+        }
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            it ?: return@observe
+            (binding.list.adapter as SearchRecyclerViewAdapter).updateLoading(it)
         }
         Log.d("ImageCropper", "search done")
     }

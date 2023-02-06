@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 
 class SearchViewModel(val searchRepository: SearchRepository) : ViewModel() {
     var searchResult: LiveData<List<Product>> = MutableLiveData()
+    var isLoading: LiveData<Boolean> = MutableLiveData()
 
     fun cropREST(image: ByteArray): LiveData<CropResponse> {
         val result = MutableLiveData<CropResponse>()
@@ -31,7 +32,9 @@ class SearchViewModel(val searchRepository: SearchRepository) : ViewModel() {
     }
 
     fun search(image: ByteArray) {
-        searchResult = searchRepository.search(image)
+        val result = searchRepository.search(image)
+        searchResult = result.first
+        isLoading = result.second
     }
 
     fun getHistory(): LiveData<List<History>> {
@@ -40,5 +43,6 @@ class SearchViewModel(val searchRepository: SearchRepository) : ViewModel() {
 
     fun getProductsByHistory(historyId: Long) {
         searchResult = searchRepository.searchInHistory(historyId)
+        isLoading = MutableLiveData(false)
     }
 }

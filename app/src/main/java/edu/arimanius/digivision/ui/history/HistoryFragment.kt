@@ -74,7 +74,7 @@ class HistoryFragment : SearchableFragment() {
             adapter = HistoryRecyclerViewAdapter()
         }
         if (columnCount > 1) {
-            binding.historyList.addItemDecoration(GridSpacingItemDecoration(columnCount, 3, false))
+            binding.historyList.addItemDecoration(GridSpacingItemDecoration(columnCount, 10, false))
         }
 
         return binding.root

@@ -28,13 +28,4 @@
         tools:context=".ui.history.HistoryFragment"
         tools:listitem="@layout/fragment_history_item" />
 
-    <View
-        android:id="@+id/spacer"
-        android:layout_width="match_parent"
-        android:layout_height="104dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/history_list" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

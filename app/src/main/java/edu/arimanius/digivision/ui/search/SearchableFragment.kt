@@ -116,10 +116,10 @@ abstract class SearchableFragment : Fragment() {
         val cropResult = viewModel.crop(byteArray)
         cropResult.observe(viewLifecycleOwner) { bb ->
             val cropRect = Rect(
-                bb.topLeft.x - ((bb.bottomRight.x - bb.topLeft.x).toFloat() / 10).toInt(),
-                bb.topLeft.y - ((bb.bottomRight.y - bb.topLeft.y).toFloat() / 10).toInt(),
-                bb.bottomRight.x + ((bb.bottomRight.x - bb.topLeft.x).toFloat() / 10).toInt(),
-                bb.bottomRight.y + ((bb.bottomRight.y - bb.topLeft.y).toFloat() / 10).toInt(),
+                bb.topLeft.x - ((bb.bottomRight.x - bb.topLeft.x).toFloat() / 5).toInt(),
+                bb.topLeft.y - ((bb.bottomRight.y - bb.topLeft.y).toFloat() / 5).toInt(),
+                bb.bottomRight.x + ((bb.bottomRight.x - bb.topLeft.x).toFloat() / 5).toInt(),
+                bb.bottomRight.y + ((bb.bottomRight.y - bb.topLeft.y).toFloat() / 5).toInt(),
             )
             Log.d("CROP", bb.toString())
             (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE

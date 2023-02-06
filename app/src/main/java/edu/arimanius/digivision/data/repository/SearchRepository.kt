@@ -86,8 +86,9 @@ class SearchRepository(
         }
     }
 
-    fun search(image: ByteArray): LiveData<List<Product>> {
+    fun search(image: ByteArray): Pair<LiveData<List<Product>>, LiveData<Boolean>> {
         val result = MutableLiveData<List<Product>>()
+        val loading = MutableLiveData<Boolean>()
         val productList = mutableListOf<Product>()
         val channel = ManagedChannelBuilder.forAddress("arvan5.bettercallme.ir", 8081)
             .enableRetry()
@@ -143,11 +144,12 @@ class SearchRepository(
                         )
                     )
                 }
+                loading.postValue(false)
             } finally {
                 channel.shutdownNow()
             }
         }
-        return result
+        return Pair(result, loading)
     }
 
     fun getHistory(): LiveData<List<History>> {
