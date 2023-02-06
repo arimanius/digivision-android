@@ -28,12 +28,16 @@ abstract class SearchableFragment : Fragment() {
     private lateinit var cropImage: ActivityResultLauncher<CropImageContractOptions>
     protected abstract val searchButton: View
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(
             this,
             SearchViewModelFactory(requireContext())
         )[SearchViewModel::class.java]
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         cropImage = registerForActivityResult(CropImageContract()) { result ->
             if (result.isSuccessful) {

@@ -20,6 +20,29 @@ class SearchFragment : SearchableFragment() {
     private val binding get() = _binding!!
     private var columnCount = 1
     override val searchButton: View get() = binding.searchButton
+    private var imageUri: Uri? = null
+    private var historyId: Long = 0L
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val bundle = arguments
+        if (bundle != null) {
+            imageUri = Uri.parse(bundle.getString("imageUri"))
+            (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.VISIBLE
+            when (bundle.getString("action")) {
+                "history" -> {
+                    historyId = bundle.getLong("historyId")
+                    viewModel.getProductsByHistory(historyId)
+                }
+                "search" -> {
+                    val image = loadImageToByteArray(imageUri!!)
+                    Log.d("ImageCropper", "searching")
+                    viewModel.search(image)
+                    Log.d("ImageCropper", "search done")
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -42,49 +65,23 @@ class SearchFragment : SearchableFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bundle = arguments
-        if (bundle != null) {
-            when (bundle.getString("action")) {
-                "history" -> {
-                    (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.VISIBLE
-                    val imageUri = bundle.getString("imageUri")
-                    val historyId = bundle.getLong("historyId")
-                    binding.imageView.setImageURI(Uri.parse(imageUri))
-                    viewModel.getProductsByHistory(historyId).observe(viewLifecycleOwner) {
-                        it ?: return@observe
-                        (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
-                        (binding.list.adapter as SearchRecyclerViewAdapter).updateProducts(it)
-                    }
-                }
-                "search" -> {
-                    (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.VISIBLE
-                    val imageUri = Uri.parse(bundle.getString("imageUri"))
-                    binding.imageView.setImageURI(imageUri)
-                    val image = loadImageToByteArray(imageUri)
-                    Log.d("ImageCropper", "searching")
-                    viewModel.search(image)
-                    Log.d("ImageCropper", "observing")
-                    (binding.list.adapter as SearchRecyclerViewAdapter).clearProducts()
-                    viewModel.searchResult.observe(viewLifecycleOwner) {
-                        it ?: return@observe
-                        (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
-                        (binding.list.adapter as SearchRecyclerViewAdapter).updateProducts(it)
-                    }
-                    Log.d("ImageCropper", "search done")
-                }
-            }
+        binding.imageView.setImageURI(imageUri)
+        viewModel.searchResult.observe(viewLifecycleOwner) {
+            it ?: return@observe
+            (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
+            (binding.list.adapter as SearchRecyclerViewAdapter).updateProducts(it)
         }
     }
 
     override fun onImageCropped(uri: Uri) {
+        imageUri = uri
         binding.imageView.setImageURI(uri)
-        val image = loadImageToByteArray(uri)
-        Log.d("ImageCropper", "searching")
-        viewModel.search(image)
-        Log.d("ImageCropper", "observing")
+        viewModel.search(loadImageToByteArray(uri))
         (binding.list.adapter as SearchRecyclerViewAdapter).clearProducts()
+        (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.VISIBLE
         viewModel.searchResult.observe(viewLifecycleOwner) {
             it ?: return@observe
+            (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
             (binding.list.adapter as SearchRecyclerViewAdapter).updateProducts(it)
         }
         Log.d("ImageCropper", "search done")

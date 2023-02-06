@@ -38,7 +38,7 @@ class SearchViewModel(val searchRepository: SearchRepository) : ViewModel() {
         return searchRepository.getHistory()
     }
 
-    fun getProductsByHistory(historyId: Long): LiveData<List<Product>> {
-        return searchRepository.searchInHistory(historyId)
+    fun getProductsByHistory(historyId: Long) {
+        searchResult = searchRepository.searchInHistory(historyId)
     }
 }
