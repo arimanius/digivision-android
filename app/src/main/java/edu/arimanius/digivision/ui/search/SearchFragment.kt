@@ -56,9 +56,9 @@ class SearchFragment : SearchableFragment() {
                 "search" -> {
                     val imageUri = Uri.parse(bundle.getString("imageUri"))
                     binding.imageView.setImageURI(imageUri)
-                    val resized = resizeTheImage(loadImageToByteArray(imageUri), 256, 256)
+                    val image = loadImageToByteArray(imageUri)
                     Log.d("ImageCropper", "searching")
-                    viewModel.search(resized.first)
+                    viewModel.search(image)
                     Log.d("ImageCropper", "observing")
                     (binding.list.adapter as SearchRecyclerViewAdapter).clearProducts()
                     viewModel.searchResult.observe(viewLifecycleOwner) {
@@ -73,9 +73,9 @@ class SearchFragment : SearchableFragment() {
 
     override fun onImageCropped(uri: Uri) {
         binding.imageView.setImageURI(uri)
-        val resized = resizeTheImage(loadImageToByteArray(uri), 256, 256)
+        val image = loadImageToByteArray(uri)
         Log.d("ImageCropper", "searching")
-        viewModel.search(resized.first)
+        viewModel.search(image)
         Log.d("ImageCropper", "observing")
         (binding.list.adapter as SearchRecyclerViewAdapter).clearProducts()
         viewModel.searchResult.observe(viewLifecycleOwner) {

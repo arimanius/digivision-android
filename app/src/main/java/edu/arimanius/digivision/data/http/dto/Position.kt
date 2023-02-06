@@ -2,9 +2,9 @@ package edu.arimanius.digivision.data.http.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class HttpPosition(
+data class Position(
     @JsonProperty("x")
-    val x: Int,
+    var x: Int,
     @JsonProperty("y")
-    val y: Int
+    var y: Int
 )

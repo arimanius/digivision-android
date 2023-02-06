@@ -19,13 +19,15 @@ import edu.arimanius.digivision.data.entity.History
 import edu.arimanius.digivision.data.entity.ProductHistory
 import edu.arimanius.digivision.data.http.DigivisionRESTClient
 import edu.arimanius.digivision.data.http.dto.HttpCropRequest
-import edu.arimanius.digivision.data.http.dto.HttpCropResponse
+import edu.arimanius.digivision.data.http.dto.CropResponse
+import edu.arimanius.digivision.data.http.dto.Position
 import io.grpc.ManagedChannelBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.await
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.Base64
 
@@ -36,8 +38,9 @@ class SearchRepository(
     private val categoryDao: CategoryDao,
 ) {
 
-    suspend fun cropREST(image: ByteArray): HttpCropResponse {
-        val b64encoded = String(Base64.getEncoder().encode(image))
+    suspend fun cropREST(image: ByteArray): CropResponse {
+        val resized = resizeTheImage(image, 512)
+        val b64encoded = String(Base64.getEncoder().encode(resized.first))
         Log.d("SearchRepository", "encoded: $b64encoded")
         val response = DigivisionRESTClient.getClient().getService().crop(
             HttpCropRequest(
@@ -46,7 +49,12 @@ class SearchRepository(
         )
         Log.d("SearchRepository", "response")
         return withContext(Dispatchers.IO) {
-            response.await()
+            val cropped = response.await()
+            cropped.topLeft.x = (cropped.topLeft.x / resized.second).toInt()
+            cropped.topLeft.y = (cropped.topLeft.y / resized.second).toInt()
+            cropped.bottomRight.x = (cropped.bottomRight.x / resized.second).toInt()
+            cropped.bottomRight.y = (cropped.bottomRight.y / resized.second).toInt()
+            cropped
         }
     }
 
@@ -55,13 +63,24 @@ class SearchRepository(
             .enableRetry()
             .usePlaintext()
             .build()
-        val stub = SearchServiceGrpc.newFutureStub(channel)
-        val response = stub.crop(cropRequest {
-            this.image = ByteString.copyFrom(image)
-        })
         try {
+            val stub = SearchServiceGrpc.newFutureStub(channel)
+            val resized = resizeTheImage(image, 512)
+            val response = stub.crop(cropRequest {
+                this.image = ByteString.copyFrom(resized.first)
+            })
             return withContext(Dispatchers.IO) {
-                response.get()
+                val cropped = response.get()
+                CropResponse(
+                    topLeft = Position(
+                        x = (cropped.topLeft.x / resized.second).toInt(),
+                        y = (cropped.topLeft.y / resized.second).toInt(),
+                    ),
+                    bottomRight = Position(
+                        x = (cropped.bottomRight.x / resized.second).toInt(),
+                        y =  (cropped.bottomRight.y / resized.second).toInt()
+                    ),
+                )
             }
         } finally {
             channel.shutdownNow()
@@ -76,10 +95,11 @@ class SearchRepository(
             .usePlaintext()
             .build()
         val stub = SearchServiceGrpc.newBlockingStub(channel)
+        val resized = resizeTheImage(image, 256, 256)
         val products = stub.asyncSearch(searchRequest {
-            this.image = ByteString.copyFrom(image)
+            this.image = ByteString.copyFrom(resized.first)
             this.params = searchParams {
-                this.topK = 10
+                this.topK = 40
                 this.ranker = Ranker.FIRST_IMAGE
             }
         })
@@ -193,5 +213,37 @@ class SearchRepository(
 
             throw it
         }
+    }
+
+    private fun resizeTheImage(
+        bytes: ByteArray?,
+        w: Int = -1,
+        h: Int = -1
+    ): Pair<ByteArray, Float> {
+        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes!!.size)
+        Log.d("PhotoPicker", "Original size: ${bitmap.width}x${bitmap.height}")
+        var width = w
+        var height = h
+        var scale = width.toFloat() / bitmap.width.toFloat()
+        if (width == -1) {
+            assert(height != -1)
+            scale = height.toFloat() / bitmap.height.toFloat()
+            val ratio = bitmap.height.toFloat() / h.toFloat()
+            width = (bitmap.width / ratio).toInt()
+        } else if (h == -1) {
+            assert(width != -1)
+            val ratio = w.toFloat() / bitmap.width.toFloat()
+            height = (bitmap.height * ratio).toInt()
+        }
+        val resized = Bitmap.createScaledBitmap(bitmap, width, height, true)
+        Log.d("PhotoPicker", "Resized size: ${resized.width}x${resized.height}")
+        Log.d("PhotoPicker", "Scale: $scale")
+        return Pair(bitmapToByteArray(resized), scale)
+    }
+
+    private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+        val stream = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        return stream.toByteArray()
     }
 }

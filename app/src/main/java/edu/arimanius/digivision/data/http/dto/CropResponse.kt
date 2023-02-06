@@ -2,9 +2,9 @@ package edu.arimanius.digivision.data.http.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class HttpCropResponse(
+data class CropResponse(
     @JsonProperty("topLeft")
-    val topLeft: HttpPosition,
+    var topLeft: Position,
     @JsonProperty("bottomRight")
-    val bottomRight: HttpPosition
+    var bottomRight: Position
 )

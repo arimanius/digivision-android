@@ -3,8 +3,6 @@ package edu.arimanius.digivision.ui.search
 import android.Manifest
 import android.app.AlertDialog
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
@@ -21,9 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
-import java.io.ByteArrayOutputStream
 import java.io.File
-import kotlin.math.max
 
 abstract class SearchableFragment : Fragment() {
     private val PERMISSION_REQUEST_CODE = 200
@@ -111,25 +107,14 @@ abstract class SearchableFragment : Fragment() {
 
     private fun startCropper(uri: Uri) {
         val byteArray = loadImageToByteArray(uri)
-        val resized = resizeTheImage(byteArray, 512)
-        val cropResult = viewModel.crop(resized.first)
+        val cropResult = viewModel.crop(byteArray)
         cropResult.observe(viewLifecycleOwner) { bb ->
             val cropRect = Rect(
-                (bb.topLeft.x / resized.second).toInt(),
-                (bb.topLeft.y / resized.second).toInt(),
-                (bb.bottomRight.x / resized.second).toInt(),
-                (bb.bottomRight.y / resized.second).toInt()
+                bb.topLeft.x - ((bb.bottomRight.x - bb.topLeft.x).toFloat() / 10).toInt(),
+                bb.topLeft.y - ((bb.bottomRight.y - bb.topLeft.y).toFloat() / 10).toInt(),
+                bb.bottomRight.x + ((bb.bottomRight.x - bb.topLeft.x).toFloat() / 10).toInt(),
+                bb.bottomRight.y + ((bb.bottomRight.y - bb.topLeft.y).toFloat() / 10).toInt(),
             )
-            cropRect.left = max(
-                0,
-                cropRect.left - ((cropRect.right - cropRect.left).toFloat() / 10).toInt()
-            )
-            cropRect.top = max(
-                0,
-                cropRect.top - ((cropRect.bottom - cropRect.top).toFloat() / 10).toInt()
-            )
-            cropRect.right += ((cropRect.right - cropRect.left).toFloat() / 10).toInt()
-            cropRect.bottom += ((cropRect.bottom - cropRect.top).toFloat() / 10).toInt()
             Log.d("CROP", bb.toString())
             cropImage.launch(
                 CropImageContractOptions(
@@ -146,37 +131,5 @@ abstract class SearchableFragment : Fragment() {
         requireContext().contentResolver.openInputStream(uri).use { inputStream ->
             return inputStream!!.readBytes()
         }
-    }
-
-    protected fun resizeTheImage(
-        bytes: ByteArray?,
-        w: Int = -1,
-        h: Int = -1
-    ): Pair<ByteArray, Float> {
-        val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes!!.size)
-        Log.d("PhotoPicker", "Original size: ${bitmap.width}x${bitmap.height}")
-        var width = w
-        var height = h
-        var scale = width.toFloat() / bitmap.width.toFloat()
-        if (width == -1) {
-            assert(height != -1)
-            scale = height.toFloat() / bitmap.height.toFloat()
-            val ratio = bitmap.height.toFloat() / h.toFloat()
-            width = (bitmap.width / ratio).toInt()
-        } else if (h == -1) {
-            assert(width != -1)
-            val ratio = w.toFloat() / bitmap.width.toFloat()
-            height = (bitmap.height * ratio).toInt()
-        }
-        val resized = Bitmap.createScaledBitmap(bitmap, width, height, true)
-        Log.d("PhotoPicker", "Resized size: ${resized.width}x${resized.height}")
-        Log.d("PhotoPicker", "Scale: $scale")
-        return Pair(bitmapToByteArray(resized), scale)
-    }
-
-    protected fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
-        val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-        return stream.toByteArray()
     }
 }

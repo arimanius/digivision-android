@@ -1,7 +1,7 @@
 package edu.arimanius.digivision.data.http
 
 import edu.arimanius.digivision.data.http.dto.HttpCropRequest
-import edu.arimanius.digivision.data.http.dto.HttpCropResponse
+import edu.arimanius.digivision.data.http.dto.CropResponse
 import retrofit2.Call
 import retrofit2.http.*
 
@@ -10,5 +10,5 @@ interface DigivisionRESTService {
     @POST("crop")
     fun crop(
         @Body request: HttpCropRequest
-    ): Call<HttpCropResponse>
+    ): Call<CropResponse>
 }
