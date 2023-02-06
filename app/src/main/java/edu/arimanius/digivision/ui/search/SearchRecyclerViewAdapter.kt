@@ -1,6 +1,5 @@
 package edu.arimanius.digivision.ui.search
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -36,15 +35,16 @@ class SearchRecyclerViewAdapter(
         Glide.with(holder.binding.root).load(item.imageUrl).into(holder.imageView)
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateAllProducts(products: List<Product>) {
+    fun updateProducts(products: List<Product>) {
+        val lastLength = this.products.size
         this.products = products
-        notifyDataSetChanged()
+        notifyItemRangeInserted(lastLength, products.size - lastLength)
     }
 
-    fun updateProducts(products: List<Product>) {
-        this.products = products
-        notifyItemInserted(products.size - 1)
+    fun clearProducts() {
+        val lastLength = this.products.size
+        this.products = emptyList()
+        notifyItemRangeRemoved(0, lastLength)
     }
 
     override fun getItemCount(): Int = products.size

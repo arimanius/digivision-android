@@ -1,22 +1,24 @@
-package edu.arimanius.digivision.ui.search
+package edu.arimanius.digivision.ui.history
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import edu.arimanius.digivision.R
 import edu.arimanius.digivision.databinding.FragmentHistoryBinding
+import edu.arimanius.digivision.ui.search.SearchableFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class HistoryFragment : Fragment() {
-
+class HistoryFragment : SearchableFragment() {
     private var _binding: FragmentHistoryBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: SearchViewModel
+    override val searchButton: View get() = binding.searchButton
     private var columnCount = 2
 
     override fun onCreateView(
@@ -39,17 +41,18 @@ class HistoryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(
-            this,
-            SearchViewModelFactory(requireContext())
-        )[SearchViewModel::class.java]
 
         viewModel.getHistory().observe(viewLifecycleOwner) {
             (binding.historyList.adapter as HistoryRecyclerViewAdapter).updateHistories(it)
         }
+    }
 
-        binding.searchButton.setOnClickListener {
-            findNavController().navigate(R.id.action_historyFragment_to_searchFragment)
+    override fun onImageCropped(uri: Uri) {
+        CoroutineScope(Dispatchers.Main).launch {
+            val bundle = Bundle()
+            bundle.putString("action", "search")
+            bundle.putString("imageUri", uri.toString())
+            findNavController().navigate(R.id.action_historyFragment_to_searchFragment, bundle)
         }
     }
 }

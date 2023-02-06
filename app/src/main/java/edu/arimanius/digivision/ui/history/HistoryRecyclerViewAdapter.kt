@@ -1,4 +1,4 @@
-package edu.arimanius.digivision.ui.search
+package edu.arimanius.digivision.ui.history
 
 import android.annotation.SuppressLint
 import android.net.Uri
@@ -6,8 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.RecyclerView
-import edu.arimanius.digivision.MainActivity
 import edu.arimanius.digivision.R
 import edu.arimanius.digivision.data.entity.History
 import edu.arimanius.digivision.databinding.FragmentHistoryItemBinding
@@ -32,12 +32,10 @@ class HistoryRecyclerViewAdapter(
         holder.imageView.setImageURI(Uri.parse(item.imageUri))
         holder.imageView.setOnClickListener {
             val bundle = Bundle()
+            bundle.putString("action", "history")
             bundle.putString("imageUri", item.imageUri)
             bundle.putLong("historyId", item.id)
-            val fragment = SearchFragment()
-            fragment.arguments = bundle
-            (holder.itemView.context as MainActivity).supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment, fragment).commit()
+            holder.binding.root.findNavController().navigate(R.id.action_historyFragment_to_searchFragment, bundle)
         }
     }
 
@@ -49,7 +47,7 @@ class HistoryRecyclerViewAdapter(
 
     override fun getItemCount(): Int = histories.size
 
-    inner class ViewHolder(binding: FragmentHistoryItemBinding) :
+    inner class ViewHolder(val binding: FragmentHistoryItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         val imageView: ImageView = binding.historyImage
     }

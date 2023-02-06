@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/historyFragment"
-        android:name="edu.arimanius.digivision.ui.search.HistoryFragment"
+        android:name="edu.arimanius.digivision.ui.history.HistoryFragment"
         android:label="تاریخچه" >
         <action
             android:id="@+id/action_historyFragment_to_searchFragment"

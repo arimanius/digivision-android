@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.LiveData
@@ -95,15 +94,14 @@ class SearchRepository(
                     imageUri = uri.toString(),
                 )
             )
-            Log.d("SearchRepository", "history inserted with id ${historyId}")
+            Log.d("SearchRepository", "history inserted with id $historyId")
             try {
                 products.forEach { response ->
                     Log.d("SearchRepository", "product ${response.product.id} received")
                     productList.add(response.product)
                     result.postValue(productList)
                     val categoryIds = response.product.categoriesList.map { category ->
-                        val c = categoryDao.getByUrl(category.url)
-                        c?.id ?: categoryDao.insert(
+                        categoryDao.insert(
                             CategoryHistory(
                                 url = category.url,
                                 title = category.title,
@@ -168,7 +166,7 @@ class SearchRepository(
         return result
     }
 
-    fun saveImage(image: ByteArray, name: String): Uri {
+    private fun saveImage(image: ByteArray, name: String): Uri {
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
         }
