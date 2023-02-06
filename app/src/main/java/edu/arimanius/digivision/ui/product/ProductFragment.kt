@@ -35,6 +35,7 @@ class ProductFragment : Fragment() {
                 url = it.getString("product_url")!!
                 imageUrl = it.getString("product_imageUrl")!!
                 status = it.getString("product_status")!!
+                price = it.getLong("product_price")
                 rate = rating {
                     rate = it.getInt("product_rate_rate")
                     count = it.getInt("product_rate_count")

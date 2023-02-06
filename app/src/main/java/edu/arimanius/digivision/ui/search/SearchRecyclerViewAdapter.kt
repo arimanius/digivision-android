@@ -44,6 +44,7 @@ class SearchRecyclerViewAdapter(
             bundle.putString("product_url", item.url)
             bundle.putString("product_imageUrl", item.imageUrl)
             bundle.putString("product_status", item.status)
+            bundle.putLong("product_price", item.price)
             bundle.putInt("product_rate_rate", item.rate.rate)
             bundle.putInt("product_rate_count", item.rate.count)
             bundle.putStringArrayList("category_titles", ArrayList(item.categoriesList.map { it.title }))

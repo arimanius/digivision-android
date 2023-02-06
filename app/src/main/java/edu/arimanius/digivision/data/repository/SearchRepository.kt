@@ -120,7 +120,7 @@ class SearchRepository(
                     productList.add(response.product)
                     result.postValue(productList)
                     val categoryIds = response.product.categoriesList.map { category ->
-                        categoryDao.insert(
+                        categoryDao.getByUrl(category.url)?.id ?: categoryDao.insert(
                             CategoryHistory(
                                 url = category.url,
                                 title = category.title,
@@ -135,6 +135,7 @@ class SearchRepository(
                             url = response.product.url,
                             imageUrl = response.product.imageUrl,
                             status = response.product.status,
+                            price = response.product.price,
                             rate = response.product.rate.rate,
                             rateCount = response.product.rate.count,
                             categoryIds = categoryIds.joinToString(separator = ",") { it.toString() }
@@ -163,6 +164,7 @@ class SearchRepository(
                     url = it.url
                     imageUrl = it.imageUrl
                     status = it.status
+                    price = it.price
                     rate = rating {
                         it.rate
                         it.rateCount

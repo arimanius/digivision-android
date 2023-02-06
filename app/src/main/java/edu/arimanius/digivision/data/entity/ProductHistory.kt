@@ -26,6 +26,7 @@ data class ProductHistory(
     var title: String,
     var url: String,
     var status: String,
+    var price: Long,
     var imageUrl: String,
     var rate: Int,
     var rateCount: Int,
