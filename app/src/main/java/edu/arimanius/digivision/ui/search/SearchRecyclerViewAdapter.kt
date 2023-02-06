@@ -2,6 +2,7 @@ package edu.arimanius.digivision.ui.search
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -39,6 +40,7 @@ class SearchRecyclerViewAdapter(
         }
         holder.binding.root.setOnClickListener {
             val bundle = Bundle()
+            Log.d("a", item.toString())
             bundle.putInt("product_id", item.id)
             bundle.putString("product_title", item.title)
             bundle.putString("product_url", item.url)

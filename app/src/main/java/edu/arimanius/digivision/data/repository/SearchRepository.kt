@@ -138,7 +138,8 @@ class SearchRepository(
                             price = response.product.price,
                             rate = response.product.rate.rate,
                             rateCount = response.product.rate.count,
-                            categoryIds = categoryIds.joinToString(separator = ",") { it.toString() }
+                            categoryIds = categoryIds.joinToString(separator = ",") { it.toString() },
+                            score = response.product.score,
                         )
                     )
                 }
@@ -158,6 +159,7 @@ class SearchRepository(
         CoroutineScope(Dispatchers.IO).launch {
             val productHistories = productHistoryDao.getByHistoryId(historyId)
             val products = productHistories.map {
+                Log.d("b", "hist rate (${it.productId}): ${it.rate}")
                 product {
                     id = it.productId
                     title = it.title
@@ -166,8 +168,8 @@ class SearchRepository(
                     status = it.status
                     price = it.price
                     rate = rating {
-                        it.rate
-                        it.rateCount
+                        rate = it.rate
+                        count = it.rateCount
                     }
                     categories.addAll(
                         it.categoryIds.split(",").mapNotNull { categoryId ->

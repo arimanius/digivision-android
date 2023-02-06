@@ -9,4 +9,5 @@
     <string name="home_title">دیجی‌ویژن</string>
     <string name="main_image">mainImage</string>
     <string name="price">قیمت</string>
+    <string name="ratingCount"># رای</string>
 </resources>

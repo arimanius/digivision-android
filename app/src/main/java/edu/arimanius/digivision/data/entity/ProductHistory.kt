@@ -31,6 +31,7 @@ data class ProductHistory(
     var rate: Int,
     var rateCount: Int,
     var categoryIds: String,
+    var score: Float,
     var historyId: Long,
 ) {
     @PrimaryKey(autoGenerate = true)
