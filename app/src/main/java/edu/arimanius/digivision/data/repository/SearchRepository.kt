@@ -58,7 +58,7 @@ class SearchRepository(
     }
 
     suspend fun crop(image: ByteArray): CropResponse {
-        val channel = ManagedChannelBuilder.forAddress("arvan5.bettercallme.ir", 8081)
+        val channel = ManagedChannelBuilder.forAddress("digivision.chicheca.ir", 8081)
             .enableRetry()
             .usePlaintext()
             .build()
@@ -90,7 +90,7 @@ class SearchRepository(
         val result = MutableLiveData<List<Product>>()
         val loading = MutableLiveData<Boolean>()
         val productList = mutableListOf<Product>()
-        val channel = ManagedChannelBuilder.forAddress("arvan5.bettercallme.ir", 8081)
+        val channel = ManagedChannelBuilder.forAddress("digivision.chicheca.ir", 8081)
             .enableRetry()
             .usePlaintext()
             .build()

@@ -17,7 +17,7 @@ class DigivisionRESTClient private constructor(private val retrofit: Retrofit) {
             return instance ?: synchronized(this) {
                 instance ?: DigivisionRESTClient(
                     Retrofit.Builder()
-                        .baseUrl("http://arvan5.bettercallme.ir:8082/api/v1/")
+                        .baseUrl("http://digivision.chicheca.ir:8082/api/v1/")
                         .addConverterFactory(JacksonConverterFactory.create())
                         .client(okHttpClient)
                         .build()
