@@ -1,17 +1,24 @@
 package edu.arimanius.digivision
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import edu.arimanius.digivision.databinding.ActivityMainBinding
 
+
 class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
 
+    private fun forceRTLIfSupported() {
+        window.decorView.layoutDirection = View.LAYOUT_DIRECTION_RTL
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        forceRTLIfSupported()
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
