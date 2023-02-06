@@ -21,9 +21,8 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.fragment) as NavHostFragment
 
         val navController = navHostFragment.navController
-        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         val appBarConfiguration = AppBarConfiguration(
-            navController.graph, drawerLayout,
+            navController.graph,
             fallbackOnNavigateUpListener = ::onSupportNavigateUp
         )
 
