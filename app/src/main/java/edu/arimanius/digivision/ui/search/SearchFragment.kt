@@ -29,6 +29,7 @@ class SearchFragment : SearchableFragment() {
         if (bundle != null) {
             imageUri = Uri.parse(bundle.getString("imageUri"))
             (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.VISIBLE
+            viewModel.changeIsLoading(false)
             when (bundle.getString("action")) {
                 "history" -> {
                     historyId = bundle.getLong("historyId")
@@ -69,6 +70,7 @@ class SearchFragment : SearchableFragment() {
         viewModel.searchResult.observe(viewLifecycleOwner) {
             it ?: return@observe
             (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
+            viewModel.changeIsLoading(true)
             (binding.list.adapter as SearchRecyclerViewAdapter).updateProducts(it)
         }
         viewModel.isLoading.observe(viewLifecycleOwner) {
@@ -83,9 +85,11 @@ class SearchFragment : SearchableFragment() {
         viewModel.search(loadImageToByteArray(uri))
         (binding.list.adapter as SearchRecyclerViewAdapter).clearProducts()
         (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.VISIBLE
+        viewModel.changeIsLoading(false)
         viewModel.searchResult.observe(viewLifecycleOwner) {
             it ?: return@observe
             (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
+            viewModel.changeIsLoading(true)
             (binding.list.adapter as SearchRecyclerViewAdapter).updateProducts(it)
         }
         viewModel.isLoading.observe(viewLifecycleOwner) {

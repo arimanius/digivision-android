@@ -45,4 +45,8 @@ class SearchViewModel(val searchRepository: SearchRepository) : ViewModel() {
         searchResult = searchRepository.searchInHistory(historyId)
         isLoading = MutableLiveData(false)
     }
+
+    fun changeIsLoading(isLoading: Boolean) {
+        (this.isLoading as MutableLiveData).postValue(isLoading)
+    }
 }
