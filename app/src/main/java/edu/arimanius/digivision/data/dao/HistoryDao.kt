@@ -12,4 +12,7 @@ interface HistoryDao: InsertableDao<History> {
 
     @Query("SELECT * FROM histories WHERE id = :id")
     suspend fun getById(id: Long): History?
+
+    @Query("DELETE FROM histories WHERE id = :id")
+    suspend fun deleteById(id: Long)
 }

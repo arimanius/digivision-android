@@ -8,4 +8,7 @@ import edu.arimanius.digivision.data.entity.ProductHistory
 interface ProductHistoryDao: InsertableDao<ProductHistory> {
     @Query("SELECT * FROM products WHERE historyId = :historyId ORDER BY score DESC")
     suspend fun getByHistoryId(historyId: Long): List<ProductHistory>
+
+    @Query("DELETE FROM products WHERE historyId = :historyId")
+    suspend fun deleteByHistoryId(historyId: Long)
 }

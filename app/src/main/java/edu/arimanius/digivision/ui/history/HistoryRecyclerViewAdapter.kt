@@ -1,6 +1,7 @@
 package edu.arimanius.digivision.ui.history
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,9 +12,11 @@ import androidx.recyclerview.widget.RecyclerView
 import edu.arimanius.digivision.R
 import edu.arimanius.digivision.data.entity.History
 import edu.arimanius.digivision.databinding.FragmentHistoryItemBinding
+import edu.arimanius.digivision.ui.search.SearchViewModel
 
 class HistoryRecyclerViewAdapter(
-    private var histories: List<History> = emptyList()
+    private var histories: List<History> = emptyList(),
+    private val viewModel: SearchViewModel,
 ) : RecyclerView.Adapter<HistoryRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,6 +39,17 @@ class HistoryRecyclerViewAdapter(
             bundle.putString("imageUri", item.imageUri)
             bundle.putLong("historyId", item.id)
             holder.binding.root.findNavController().navigate(R.id.action_historyFragment_to_searchFragment, bundle)
+        }
+        holder.imageView.setOnLongClickListener {
+            AlertDialog.Builder(holder.imageView.context, R.style.AlertDialogCustom)
+                .setTitle("حذف تاریخچه")
+                .setMessage("آیا میخواهید تاریخچه را حذف کنید؟")
+                .setPositiveButton("بله") { _, _ ->
+                    viewModel.deleteHistory(item.id)
+                }
+                .setNegativeButton("خیر") { _, _ -> }
+                .show()
+            true
         }
     }
 

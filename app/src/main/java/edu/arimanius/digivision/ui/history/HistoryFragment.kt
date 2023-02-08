@@ -1,6 +1,5 @@
 package edu.arimanius.digivision.ui.history
 
-import android.graphics.Rect
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -34,7 +33,7 @@ class HistoryFragment : SearchableFragment() {
                 columnCount <= 1 -> LinearLayoutManager(context)
                 else -> GridLayoutManager(context, columnCount)
             }
-            adapter = HistoryRecyclerViewAdapter()
+            adapter = HistoryRecyclerViewAdapter(viewModel = viewModel)
         }
         return binding.root
     }

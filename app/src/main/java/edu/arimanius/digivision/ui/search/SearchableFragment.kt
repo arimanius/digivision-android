@@ -16,10 +16,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.canhub.cropper.CropImageContract
 import com.canhub.cropper.CropImageContractOptions
 import com.canhub.cropper.CropImageOptions
 import edu.arimanius.digivision.MainActivity
+import edu.arimanius.digivision.R
 import java.io.File
 
 abstract class SearchableFragment : Fragment() {
@@ -87,6 +89,20 @@ abstract class SearchableFragment : Fragment() {
                 requestPermission()
             }
             dialogBuilder.show()
+        }
+
+        viewModel.error.observe(viewLifecycleOwner) {
+            it ?: return@observe
+            (requireActivity() as MainActivity).binding.loadingPanel.visibility = View.GONE
+            AlertDialog.Builder(requireContext())
+                .setMessage(it)
+                .setCancelable(true)
+                .setPositiveButton("باشه") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
+            viewModel.clearError()
+            findNavController().navigate(R.id.historyFragment)
         }
     }
 

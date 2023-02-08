@@ -86,9 +86,9 @@ class SearchRepository(
         }
     }
 
-    fun search(image: ByteArray): Pair<LiveData<List<Product>>, LiveData<Boolean>> {
+    fun search(image: ByteArray, errorCallback: (Throwable) -> Unit): Pair<LiveData<List<Product>>, LiveData<Boolean>> {
         val result = MutableLiveData<List<Product>>()
-        val loading = MutableLiveData<Boolean>()
+        val loading = MutableLiveData(false)
         val productList = mutableListOf<Product>()
         val channel = ManagedChannelBuilder.forAddress("digivision.chicheca.ir", 8081)
             .enableRetry()
@@ -120,6 +120,7 @@ class SearchRepository(
                     Log.d("SearchRepository", "product ${response.product.id} received")
                     productList.add(response.product)
                     result.postValue(productList)
+                    loading.postValue(true)
                     val categoryIds = response.product.categoriesList.map { category ->
                         categoryDao.getByUrl(category.url)?.id ?: categoryDao.insert(
                             CategoryHistory(
@@ -145,6 +146,10 @@ class SearchRepository(
                     )
                 }
                 loading.postValue(false)
+            } catch (e: Exception) {
+                historyDao.deleteById(historyId)
+                productHistoryDao.deleteByHistoryId(historyId)
+                errorCallback(Exception("خطا در اتصال به سرور"))
             } finally {
                 channel.shutdownNow()
             }
@@ -242,5 +247,12 @@ class SearchRepository(
         val stream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
         return stream.toByteArray()
+    }
+
+    fun deleteHistory(historyId: Long) {
+        CoroutineScope(Dispatchers.IO).launch {
+            historyDao.deleteById(historyId)
+            productHistoryDao.deleteByHistoryId(historyId)
+        }
     }
 }
